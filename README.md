@@ -1,93 +1,171 @@
 # homelab-platform
 
+> From bare metal to a fully automated, observable platform — and then to the cloud — all as code.
 
 
-## Getting started
+## Where the project lives
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+| | Repository | Content |
+|---|---|---|
+| **Primary** | [GitLab](https://gitlab.com/rmellonh/homelab-platform) | Code, CI/CD pipelines, merge requests, issues and registry |
+| **Mirror** | [GitHub](https://github.com/rafamellonh/homelab-platform) | Automatic copy of the code and documentation (read-only) |
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Development happens on GitLab. Every push is automatically replicated to GitHub through a *push mirror*.
+To see pipelines running, open issues or follow merge requests, visit GitLab.
+All documentation, including the issues found and how they were solved, lives in the repository itself and is available on both.
 
-## Add your files
+---
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## About
+
+This project documents, step by step, the build of a complete platform on two mini PCs at home:
+starting from a bare-metal Proxmox install, through infrastructure as code, configuration management,
+Kubernetes, CI/CD, GitOps and observability — delivering and operating real applications —
+and finally migrating the workloads to a public cloud using the same code.
+
+The goal is to apply and demonstrate SRE/DevOps skills on real infrastructure, not in a sandbox.
+
+**Journey:** bare metal → automation → platform → operations → cloud
+
+## Motivation
+
+I have experience with most of the tools in this project, but my current job doesn't put me
+in daily contact with all of them. This project is how I keep them in practice and up to date
+while developing the skills I don't yet use day to day.
+
+| Goal | Areas |
+|---|---|
+| **Practice and stay current** | Linux, virtualization (Proxmox), Ansible, Terraform, Kubernetes, Zabbix, cloud |
+| **Learn and develop** | CI/CD, GitOps (Argo CD), cloud-native observability (Prometheus and Grafana), SRE practices |
+
+That's why the documentation records not only what worked, but also the mistakes, the questions
+and the decisions made along the way.
+
+## Architecture
+
+<!-- Uncomment when the diagram is ready:
+![Architecture](docs/images/architecture.png)
+-->
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/rmellonh/homelab-platform.git
-git branch -M main
-git push -uf origin main
+GitLab.com (primary) ──push mirror──► GitHub (mirror)
+   │
+   │ CI/CD jobs (local runner)
+   ▼
+┌──────────────────── Proxmox VE cluster ────────────────────┐
+│  pve-01 (16 GB)                   pve-02 (32 GB)            │
+│  ├── mgmt-01   runner/TF/Ansible  ├── k8s-worker-01         │
+│  ├── zbx-01    Zabbix             └── k8s-worker-02         │
+│  └── k8s-cp-01                                              │
+└─────────────────────────────────────────────────────────────┘
+
+Kubernetes: MetalLB · Ingress NGINX · Argo CD
+            Prometheus · Alertmanager · Grafana
+            Podinfo · Online Boutique
 ```
 
-## Integrate with your tools
+## Tech stack
 
-* [Set up project integrations](https://gitlab.com/rmellonh/homelab-platform/-/settings/integrations)
+| Layer | Tools |
+|---|---|
+| Virtualization | Proxmox VE 9 |
+| Operating system | Ubuntu 24.04 LTS (cloud-init golden image) |
+| Provisioning | Terraform (`bpg/proxmox`) |
+| Configuration | Ansible |
+| Containers & orchestration | Kubernetes (kubeadm), containerd |
+| Repository & CI/CD | GitLab.com + GitLab CI (local runner), mirrored to GitHub |
+| Registry | GitLab Container Registry |
+| GitOps | Argo CD, Kustomize |
+| Monitoring | Zabbix 7 LTS, Prometheus, Alertmanager, Grafana |
+| Applications | Podinfo, Online Boutique |
+| Cloud | AWS or Azure (to be decided) |
 
-## Collaborate with your team
+## Hardware
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+| Host | Role | RAM |
+|---|---|---|
+| Dell mini PC #1 | Proxmox node `pve-01` | 16 GB |
+| Dell mini PC #2 | Proxmox node `pve-02` | 32 GB |
 
-## Test and Deploy
+## Applications
 
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+- **[Podinfo](https://github.com/stefanprodan/podinfo)** — used to demonstrate the full delivery path:
+  build, security scan, push to the registry and GitOps deployment.
+- **[Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo)** — an 11-microservice application
+  with a built-in load generator, used for operations, monitoring and failure scenarios.
 
 ## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+| # | Phase | Status | Docs |
+|---|---|---|---|
+| 0 | Planning | ⏳ | [00-planning](docs/00-planning.md) |
+| 1 | Proxmox installation & cluster | ⏳ | [01-proxmox](docs/01-proxmox.md) |
+| 2 | Golden image | ⏳ | [02-golden-image](docs/02-golden-image.md) |
+| 3 | First VM (manual) | ⏳ | [03-first-vm](docs/03-first-vm.md) |
+| 4 | Provisioning with Terraform | ⏳ | [04-terraform](docs/04-terraform.md) |
+| 5 | Configuration with Ansible | ⏳ | [05-ansible](docs/05-ansible.md) |
+| 6 | Infrastructure monitoring (Zabbix) | ⏳ | [06-zabbix](docs/06-zabbix.md) |
+| 7 | Kubernetes | ⏳ | [07-kubernetes](docs/07-kubernetes.md) |
+| 8 | CI/CD | ⏳ | [08-cicd](docs/08-cicd.md) |
+| 9 | GitOps | ⏳ | [09-gitops](docs/09-gitops.md) |
+| 10 | Observability | ⏳ | [10-observability](docs/10-observability.md) |
+| 11 | Online Boutique | ⏳ | [11-application](docs/11-application.md) |
+| 12 | SRE: SLOs & failure scenarios | ⏳ | [12-sre-scenarios](docs/12-sre-scenarios.md) |
+| 13 | Rebuild from scratch | ⏳ | [13-rebuild](docs/13-rebuild.md) |
+| 14 | Cloud foundation | ⏳ | [14-cloud-foundation](docs/14-cloud-foundation.md) |
+| 15 | Lift-and-shift | ⏳ | [15-lift-and-shift](docs/15-lift-and-shift.md) |
+| 16 | Managed Kubernetes | ⏳ | [16-managed-k8s](docs/16-managed-k8s.md) |
+| 17 | Hybrid & cutover | ⏳ | [17-cutover](docs/17-cutover.md) |
+| 18 | Cost report & teardown | ⏳ | [18-cost-and-teardown](docs/18-cost-and-teardown.md) |
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+✅ Done · 🚧 In progress · ⏳ Planned
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## Repository structure
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+```
+homelab-platform/
+├── docs/            # phase docs, troubleshooting, ADRs and postmortems
+├── scripts/         # golden image creation
+├── terraform/       # VM provisioning (lab and cloud environments)
+├── ansible/         # configuration management (roles and playbooks)
+├── kubernetes/      # GitOps manifests managed by Argo CD (Kustomize)
+└── .gitlab-ci.yml   # CI/CD pipeline (runs on GitLab)
+```
 
-## License
-For open source projects, say how it is licensed.
+## Documentation
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Every phase is documented with the same structure:
+
+1. Goal
+2. Prerequisites
+3. Step by step
+4. Validation
+5. Issues found and how they were solved
+6. Future improvements
+
+- **Issues and solutions (summary of all phases):** [docs/troubleshooting.md](docs/troubleshooting.md)
+- **Architecture decisions:** [docs/adr](docs/adr)
+- **Postmortems:** [docs/postmortems](docs/postmortems)
+
+## Principles
+
+- **Everything as code** — infrastructure, configuration and deployments are versioned in Git.
+- **Reproducible** — the whole platform can be destroyed and rebuilt from this repository.
+- **Portable** — generic Terraform modules, provider-agnostic Ansible roles and Kustomize overlays,
+  so the same code can move to the cloud.
+- **Secure by default** — no secrets in the repository; protected GitLab variables and Ansible Vault;
+  fork pipelines don't use the local runner; deployments only from `main`, with manual approval.
+- **Observable** — from the physical host temperature to application latency.
+- **Transparent** — mistakes, questions and decisions are recorded in the documentation, not just the final result.
+
+## Known limitations
+
+- Local storage on each Proxmox node (one golden image template per node). Shared storage is planned.
+- Single control plane node (no Kubernetes high availability).
+- Not exposed to the internet.
+
+## Author
+
+**Rafael** — Systems / Infrastructure Administrator on the path to SRE/DevOps.
+
+[LinkedIn](https://www.linkedin.com/in/rafaelmellobr) · [GitLab](https://gitlab.com/rmellonh) · [GitHub](https://github.com/rafamellonh)
