@@ -2,7 +2,7 @@
 
 > From bare metal to a fully automated, observable platform — and then to the cloud — all as code.
 
-[![pipeline status](https://gitlab.com/rmellonh/homelab-platform/badges/main/pipeline.svg)](https://gitlab.com/rmellonh/homelab-platform/-/pipelines)
+![Badges](docs/images/badges.svg)
 
 ## Where the project lives
 
@@ -132,7 +132,7 @@ homelab-platform/
 ├── README.md
 ├── .gitlab-ci.yml       # CI/CD pipeline (must stay at the root for GitLab)
 ├── docs/
-│   ├── images/          # diagrams and screenshots
+│   ├── images/          # diagrams, screenshots and badges
 │   ├── phases/          # one document per phase (00-planning.md, 01-proxmox.md, ...)
 │   ├── adr/             # architecture decision records
 │   └── postmortems/     # incident reports from failure scenarios
