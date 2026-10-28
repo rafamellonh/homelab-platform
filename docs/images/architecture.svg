@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" width="1000" height="760" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5F5E5A"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="760" fill="#FFFFFF"/>
+
+  <text x="40" y="42" font-size="22" font-weight="700" fill="#2C2C2A">homelab-platform — architecture</text>
+  <text x="40" y="64" font-size="13" fill="#5F5E5A">Bare metal → automation → platform → operations → cloud</text>
+
+  <!-- External -->
+  <rect x="40" y="88" width="260" height="62" rx="8" fill="#FAEEDA" stroke="#BA7517"/>
+  <text x="170" y="114" font-size="15" font-weight="600" text-anchor="middle" fill="#412402">GitLab.com (primary)</text>
+  <text x="170" y="134" font-size="12" text-anchor="middle" fill="#633806">Code · CI/CD · Registry · TF state</text>
+
+  <rect x="400" y="88" width="220" height="62" rx="8" fill="#F1EFE8" stroke="#888780"/>
+  <text x="510" y="114" font-size="15" font-weight="600" text-anchor="middle" fill="#2C2C2A">GitHub (mirror)</text>
+  <text x="510" y="134" font-size="12" text-anchor="middle" fill="#444441">Read-only copy</text>
+
+  <line x1="300" y1="119" x2="398" y2="119" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="349" y="111" font-size="11" text-anchor="middle" fill="#5F5E5A">push mirror</text>
+
+  <rect x="720" y="88" width="240" height="62" rx="8" fill="#F1EFE8" stroke="#888780"/>
+  <text x="840" y="114" font-size="15" font-weight="600" text-anchor="middle" fill="#2C2C2A">Home LAN clients</text>
+  <text x="840" y="134" font-size="12" text-anchor="middle" fill="#444441">*.rafaelmellonh.com.br</text>
+
+  <!-- Network bar -->
+  <rect x="40" y="180" width="920" height="40" rx="6" fill="#E1F5EE" stroke="#1D9E75"/>
+  <text x="60" y="205" font-size="13" font-weight="600" fill="#04342C">LAN 192.168.2.0/24</text>
+  <text x="250" y="205" font-size="12" fill="#085041">Hosts .170–.179 · VMs .180–.199 · MetalLB .200–.209 (Ingress NGINX .200)</text>
+
+  <line x1="840" y1="150" x2="840" y2="178" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Proxmox cluster -->
+  <rect x="40" y="245" width="920" height="300" rx="10" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="60" y="270" font-size="14" font-weight="700" fill="#2C2C2A">Proxmox VE 9 cluster · CL-QBC</text>
+  <text x="940" y="270" font-size="12" text-anchor="end" fill="#5F5E5A">Ubuntu 22.04 golden image · CPU type x86-64-v3</text>
+
+  <!-- srv01 -->
+  <rect x="60" y="285" width="430" height="245" rx="8" fill="#F8F7F4" stroke="#888780"/>
+  <text x="80" y="310" font-size="14" font-weight="700" fill="#2C2C2A">srv01 · 192.168.2.170</text>
+  <text x="80" y="328" font-size="12" fill="#5F5E5A">OptiPlex 3050 · i5-7500T · 16 GB · local-lvm 348 GiB</text>
+
+  <rect x="80" y="342" width="390" height="52" rx="6" fill="#FAEEDA" stroke="#BA7517"/>
+  <text x="96" y="364" font-size="14" font-weight="600" fill="#412402">mgmt-01 · .180</text>
+  <text x="96" y="383" font-size="12" fill="#633806">GitLab runner · Terraform · Ansible — 2 vCPU · 2 GB</text>
+
+  <rect x="80" y="402" width="390" height="52" rx="6" fill="#FCEBEB" stroke="#E24B4A"/>
+  <text x="96" y="424" font-size="14" font-weight="600" fill="#501313">zbx-01 · .181</text>
+  <text x="96" y="443" font-size="12" fill="#791F1F">Zabbix 7 LTS — hosts &amp; VMs — 2 vCPU · 4 GB</text>
+
+  <rect x="80" y="462" width="390" height="52" rx="6" fill="#E6F1FB" stroke="#378ADD"/>
+  <text x="96" y="484" font-size="14" font-weight="600" fill="#042C53">k8s-cp-01 · .182</text>
+  <text x="96" y="503" font-size="12" fill="#0C447C">Kubernetes control plane — 2 vCPU · 4 GB</text>
+
+  <!-- srv02 -->
+  <rect x="510" y="285" width="430" height="245" rx="8" fill="#F8F7F4" stroke="#888780"/>
+  <text x="530" y="310" font-size="14" font-weight="700" fill="#2C2C2A">srv02 · 192.168.2.171</text>
+  <text x="530" y="328" font-size="12" fill="#5F5E5A">OptiPlex 3070 · i3-9100T · 32 GB · local-lvm 758 GiB</text>
+
+  <rect x="530" y="342" width="390" height="52" rx="6" fill="#E6F1FB" stroke="#378ADD"/>
+  <text x="546" y="364" font-size="14" font-weight="600" fill="#042C53">k8s-worker-01 · .183</text>
+  <text x="546" y="383" font-size="12" fill="#0C447C">Kubernetes worker — 4 vCPU · 10 GB</text>
+
+  <rect x="530" y="402" width="390" height="52" rx="6" fill="#E6F1FB" stroke="#378ADD"/>
+  <text x="546" y="424" font-size="14" font-weight="600" fill="#042C53">k8s-worker-02 · .184</text>
+  <text x="546" y="443" font-size="12" fill="#0C447C">Kubernetes worker — 4 vCPU · 10 GB</text>
+
+  <rect x="530" y="462" width="390" height="52" rx="6" fill="#EEEDFE" stroke="#7F77DD"/>
+  <text x="546" y="484" font-size="14" font-weight="600" fill="#26215C">tools-01 · .185</text>
+  <text x="546" y="503" font-size="12" fill="#3C3489">NetBox · Technitium DNS (Docker) — 2 vCPU · 6 GB</text>
+
+  <!-- runner link -->
+  <path d="M80,368 H50 V152" fill="none" stroke="#BA7517" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+  <text x="58" y="237" font-size="11" fill="#854F0B">runner polls jobs</text>
+
+  <!-- Kubernetes cluster -->
+  <rect x="40" y="575" width="920" height="160" rx="10" fill="#E6F1FB" stroke="#378ADD" stroke-width="1.5"/>
+  <text x="60" y="602" font-size="14" font-weight="700" fill="#042C53">Kubernetes cluster (kubeadm) · k8s-cp-01 + k8s-worker-01/02</text>
+
+  <line x1="275" y1="514" x2="275" y2="573" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="725" y1="545" x2="725" y2="573" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+  <text x="60" y="632" font-size="12" font-weight="600" fill="#0C447C">Platform</text>
+  <rect x="60" y="642" width="280" height="72" rx="6" fill="#FFFFFF" stroke="#85B7EB"/>
+  <text x="76" y="666" font-size="13" fill="#042C53">MetalLB (L2)</text>
+  <text x="76" y="686" font-size="13" fill="#042C53">Ingress NGINX</text>
+  <text x="76" y="706" font-size="13" fill="#042C53">Argo CD (GitOps from GitLab)</text>
+
+  <text x="360" y="632" font-size="12" font-weight="600" fill="#0C447C">Observability</text>
+  <rect x="360" y="642" width="280" height="72" rx="6" fill="#FFFFFF" stroke="#85B7EB"/>
+  <text x="376" y="666" font-size="13" fill="#042C53">Prometheus</text>
+  <text x="376" y="686" font-size="13" fill="#042C53">Alertmanager</text>
+  <text x="376" y="706" font-size="13" fill="#042C53">Grafana</text>
+
+  <text x="660" y="632" font-size="12" font-weight="600" fill="#0C447C">Applications</text>
+  <rect x="660" y="642" width="280" height="72" rx="6" fill="#FFFFFF" stroke="#85B7EB"/>
+  <text x="676" y="666" font-size="13" fill="#042C53">Podinfo</text>
+  <text x="676" y="686" font-size="13" fill="#042C53">Online Boutique (11 services)</text>
+</svg>
