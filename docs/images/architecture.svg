@@ -36,7 +36,7 @@
   <!-- Proxmox cluster -->
   <rect x="40" y="245" width="920" height="300" rx="10" fill="#FFFFFF" stroke="#2C2C2A" stroke-width="1.5" stroke-dasharray="6 4"/>
   <text x="60" y="270" font-size="14" font-weight="700" fill="#2C2C2A">Proxmox VE 9 cluster · CL-QBC</text>
-  <text x="940" y="270" font-size="12" text-anchor="end" fill="#5F5E5A">Ubuntu 22.04 golden image · CPU type x86-64-v3</text>
+  <text x="940" y="270" font-size="12" text-anchor="end" fill="#5F5E5A">Ubuntu 24.04 golden image · CPU type x86-64-v3</text>
 
   <!-- srv01 -->
   <rect x="60" y="285" width="430" height="245" rx="8" fill="#F8F7F4" stroke="#888780"/>

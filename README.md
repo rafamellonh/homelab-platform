@@ -51,7 +51,7 @@ and the decisions made along the way.
 | Layer | Tools |
 |---|---|
 | Virtualization | Proxmox VE 9 |
-| Operating system | Ubuntu 22.04 LTS (cloud-init golden image) |
+| Operating system | Ubuntu 24.04 LTS (cloud-init golden image) |
 | Provisioning | Terraform (`bpg/proxmox`) |
 | Configuration | Ansible |
 | Containers & orchestration | Kubernetes (kubeadm), containerd |
@@ -66,10 +66,10 @@ and the decisions made along the way.
 
 ## Hardware
 
-| Host | Model | IP | CPU | RAM | VM storage (`local-lvm`) |
-|---|---|---|---|---|---|
-| `srv01` | Dell OptiPlex 3050 Micro | 192.168.2.170 | Intel i5-7500T (4C/4T) | 16 GB | ~348 GiB |
-| `srv02` | Dell OptiPlex 3070 Micro | 192.168.2.171 | Intel i3-9100T (4C/4T) | 32 GB | ~758 GiB |
+| Host | Model | IP | CPU | RAM | Disk | VM storage (`local-lvm`) |
+|---|---|---|---|---|---|---|
+| `srv01` | Dell OptiPlex 3050 Micro | 192.168.2.170 | Intel i5-7500T (4C/4T) | 16 GB | NVMe 476.9 GB | ~348 GiB |
+| `srv02` | Dell OptiPlex 3070 Micro | 192.168.2.171 | Intel i3-9100T (4C/4T) | 32 GB | SATA SSD 894.3 GB | ~758 GiB |
 
 ## Network
 
@@ -104,8 +104,8 @@ VMs use CPU type `x86-64-v3`, since the two nodes have different CPU generations
 | # | Phase | Status | Docs |
 |---|---|---|---|
 | 0 | Planning | ✅ | [00-planning](docs/phases/00-planning.md) |
-| 1 | Proxmox installation & cluster | ⏳ | [01-proxmox](docs/phases/01-proxmox.md) |
-| 2 | Golden image | ⏳ | [02-golden-image](docs/phases/02-golden-image.md) |
+| 1 | Proxmox installation & cluster | ✅ | [01-proxmox](docs/phases/01-proxmox.md) |
+| 2 | Golden image | ✅ | [02-golden-image](docs/phases/02-golden-image.md) |
 | 3 | First VM (manual) | ⏳ | [03-first-vm](docs/phases/03-first-vm.md) |
 | 4 | Provisioning with Terraform | ⏳ | [04-terraform](docs/phases/04-terraform.md) |
 | 5 | Configuration with Ansible | ⏳ | [05-ansible](docs/phases/05-ansible.md) |

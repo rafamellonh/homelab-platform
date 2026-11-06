@@ -8,7 +8,7 @@ The output of this phase is the reference used by every following phase (Terrafo
 
 ## 2. Prerequisites
 
-- Proxmox VE installed on both nodes and joined in the cluster `CL-QBC`
+- Proxmox VE installed on both nodes and joined in the cluster `CL-QBC` (documented in [Phase 1](01-proxmox.md))
 - Root access to both nodes (web UI and SSH)
 
 ## 3. Step by step
@@ -19,20 +19,20 @@ The output of this phase is the reference used by every following phase (Terrafo
 
 ### 3.2 Hardware inventory
 
-Data collected from the Proxmox web UI (*Node → Summary*) and from the storage status:
+Data collected from the Proxmox web UI (*Node → Summary*), `lsblk` and the storage status:
 
 ```bash
 pvesm status
 ```
 
-| Host | Model | IP | CPU | RAM | Boot mode | Root disk | VM storage (`local-lvm`, thin) |
-|---|---|---|---|---|---|---|---|
-| `srv01` | Dell OptiPlex 3050 Micro | 192.168.2.170 | Intel i5-7500T (4C/4T, Kaby Lake) | 15.5 GiB | Legacy BIOS | 94 GiB | ~348 GiB |
-| `srv02` | Dell OptiPlex 3070 Micro | 192.168.2.171 | Intel i3-9100T (4C/4T, Coffee Lake) | 31.2 GiB | UEFI + Secure Boot | 94 GiB | ~758 GiB |
+| Host | Model | IP | CPU | RAM | Boot mode | Disk | Root disk | VM storage (`local-lvm`, thin) |
+|---|---|---|---|---|---|---|---|---|
+| `srv01` | Dell OptiPlex 3050 Micro | 192.168.2.170 | Intel i5-7500T (4C/4T, Kaby Lake) | 15.5 GiB | Legacy BIOS | NVMe 476.9 GB | 94 GiB | ~348 GiB |
+| `srv02` | Dell OptiPlex 3070 Micro | 192.168.2.171 | Intel i3-9100T (4C/4T, Coffee Lake) | 31.2 GiB | UEFI + Secure Boot | SATA SSD 894.3 GB | 94 GiB | ~758 GiB |
 
 Software on both nodes:
 
-- Proxmox VE 9 (`pve-manager` 9.2.x), kernel `7.0.14-19-pve`
+- Proxmox VE 9 (`pve-manager` 9.2.x), kernel `7.0.14-28-pve` (after the Phase 1 update)
 - Repository: `pve-no-subscription` (acceptable for a lab, not for production)
 
 > The "HD space" shown in the node summary is only the root filesystem (`local`).
@@ -40,17 +40,11 @@ Software on both nodes:
 
 ### 3.3 Operating system
 
-All VMs run **Ubuntu 22.04.5 LTS (Jammy Jellyfish)**, from the cloud-init golden image.
+All VMs run **Ubuntu 24.04 LTS (Noble Numbat)**, from a cloud-init golden image built in [Phase 2](02-golden-image.md).
 
-```bash
-cat /etc/os-release
-```
-
-```
-PRETTY_NAME="Ubuntu 22.04.5 LTS"
-VERSION_ID="22.04"
-VERSION_CODENAME=jammy
-```
+Ubuntu 22.04 was the first choice (an existing template from a previous lab), but its standard support
+ends in April 2027 and the project is expected to run beyond that date. Since no project VM existed yet,
+the switch to 24.04 (standard support until 2029) had no cost.
 
 ### 3.4 IP addressing
 
@@ -79,7 +73,7 @@ Network `192.168.2.0/24`, gateway inherited from `vmbr0`.
 ### 3.5 DNS
 
 The lab uses **Technitium DNS Server** (Docker, on `tools-01`) as its authoritative DNS,
-with a subdomain of a real domain instead of an invented TLD.
+with a real domain instead of an invented TLD.
 
 | Item | Value |
 |---|---|
@@ -112,7 +106,7 @@ Applications in Kubernetes (Grafana, Argo CD, Podinfo, Online Boutique) are publ
 > in the public DNS (website, MX, TXT) must also be created in Technitium, otherwise it stops
 > resolving for clients on the LAN.
 
-> On Ubuntu 22.04, `systemd-resolved` listens on port 53. Its stub listener must be disabled
+> On Ubuntu, `systemd-resolved` listens on port 53. Its stub listener must be disabled
 > (`DNSStubListener=no` in `/etc/systemd/resolved.conf`) before the Technitium container starts.
 
 ### 3.6 Virtual machines
@@ -128,6 +122,9 @@ Applications in Kubernetes (Grafana, Argo CD, Podinfo, Online Boutique) are publ
 
 Prometheus, Grafana, Argo CD and the applications run inside the Kubernetes cluster, not in dedicated VMs.
 
+> `srv02` also hosts one personal VM (VMID 1001, 4 GiB), outside the scope of this project.
+> It is not managed by Terraform or Ansible and is shut down when the lab needs the extra memory.
+
 ### 3.7 Resource budget
 
 About 2–3 GiB of RAM is kept free on each node for Proxmox itself.
@@ -135,7 +132,7 @@ About 2–3 GiB of RAM is kept free on each node for Proxmox itself.
 | Node | Usable RAM | Allocated RAM | VM disk allocated | VM storage |
 |---|---|---|---|---|
 | srv01 | ~13 GiB | 10 GiB | 120 GB | ~348 GiB |
-| srv02 | ~28 GiB | 26 GiB | 250 GB | ~758 GiB |
+| srv02 | ~28 GiB | 26 GiB (+4 GiB personal VM when running) | 250 GB | ~758 GiB |
 
 - vCPU overcommit is accepted (lab workload).
 - Workers get 10 GiB each so that Online Boutique (with its load generator) and the monitoring stack fit together.
@@ -145,7 +142,7 @@ About 2–3 GiB of RAM is kept free on each node for Proxmox itself.
 
 - **VM names:** `<role>-<nn>` (e.g. `zbx-01`, `k8s-worker-02`).
 - **Node names:** keep the existing `srv01` / `srv02` (renaming a clustered Proxmox node requires removing it from the cluster).
-- **FQDN:** `<name>.rafaelmellonh.com.br`; Kubernetes applications under `*.apps.rafaelmellonh.com.br`.
+- **FQDN:** `<name>.rafaelmellonh.com.br` (hosts and VMs); Kubernetes applications under `*.apps.rafaelmellonh.com.br`.
 - **VM CPU type:** `x86-64-v3` on every VM. The nodes have different CPU generations, and type `host` would break migration between them.
 
 ### 3.9 Architecture decisions
@@ -156,7 +153,7 @@ Recorded as ADRs in [docs/adr](../adr):
 |---|---|
 | GitLab.com as primary repository, mirrored to GitHub | No Git server to maintain at home; GitHub mirror for visibility |
 | Golden image built directly on Proxmox (no Packer) | Simpler for two nodes; VMs created from it later by Terraform |
-| Ubuntu 22.04 LTS for all VMs | Existing golden image template; LTS release supported by kubeadm, Zabbix and Docker |
+| Ubuntu 24.04 LTS for all VMs | Standard support until 2029 (22.04 ends in April 2027); supported by kubeadm, Zabbix and Docker |
 | Kubernetes with kubeadm | Same tooling as the CKA exam; full control of the cluster |
 | NetBox on `tools-01` with Docker Compose (netbox-docker) | Fast to install, easy to upgrade and to rebuild; must exist before Terraform and the cluster |
 | Technitium DNS Server on `tools-01` (Docker) | Full authoritative DNS with forward and reverse zones and a web console, similar to Windows DNS; has an API for automation |
