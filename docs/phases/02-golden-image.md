@@ -79,7 +79,7 @@ qm start 9001
 | SSH | OpenSSH server, password login allowed | Needed to finish the setup; keys are injected later by cloud-init |
 | Snaps | none | Keep the image small |
 
-![Storage layout without LVM](../images/phase-02/storage.png)
+![Storage layout without LVM](../images/golden-image-storage.png)
 
 Expected storage summary: a single `/` (ext4, ~20 GB) on a plain partition, plus the 1 MB BIOS grub spacer.
 

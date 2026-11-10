@@ -184,14 +184,14 @@ Created in the web console (`http://192.168.2.185:5380`, user `admin`) under *Zo
 - `rafaelmellonh.com.br`
 - `2.168.192.in-addr.arpa`
 
-![Technitium zones](../images/phase-03/technitium-zones.png)
+![Technitium zones](../images/technitium-zones.png)
 
 #### Records
 
 All records are created in the **forward** zone. For each host A record, the option
 **Add reverse (PTR) record** creates the PTR in the reverse zone automatically.
 
-![Add record with PTR](../images/phase-03/technitium-add-record.png)
+![Add record with PTR](../images/technitium-add-record.png)
 
 | Name | Type | Value | Add reverse (PTR) |
 |---|---|---|---|
@@ -211,9 +211,9 @@ All records are created in the **forward** zone. For each host A record, the opt
 - An IP has a single PTR, pointing to the machine's own name (`185 → tools-01`). Service aliases (`dns`, `netbox`) only exist in the forward zone.
 - `*.apps` is a pattern, not a host, so it has no PTR.
 
-![Forward zone](../images/phase-03/technitium-forward-zone.png)
+![Forward zone](../images/technitium-forward-zone.png)
 
-![Reverse zone](../images/phase-03/technitium-reverse-zone.png)
+![Reverse zone](../images/technitium-reverse-zone.png)
 
 #### HTTPS for the web console
 
@@ -228,7 +228,7 @@ All records are created in the **forward** zone. For each host A record, the opt
 | Use A Self Signed TLS Certificate When TLS Certificate File Path Is Unspecified | ✅ |
 | Web Service HTTPS Port | 53443 |
 
-![HTTPS options](../images/phase-03/technitium-https.png)
+![HTTPS options](../images/technitium-https.png)
 
 > With Docker in bridge mode, ports and local addresses must **only** be changed in `compose.yaml`.
 > Changing them in *Settings* makes the console unreachable.
@@ -236,7 +236,7 @@ All records are created in the **forward** zone. For each host A record, the opt
 The console is available at `https://dns.rafaelmellonh.com.br:53443`. The browser shows *Not secure* because the
 certificate is self-signed.
 
-![Technitium dashboard](../images/phase-03/technitium-dashboard.png)
+![Technitium dashboard](../images/technitium-dashboard.png)
 
 ### 3.5 NetBox
 
@@ -301,8 +301,17 @@ netbox.rafaelmellonh.com.br {
 ```yaml
 services:
   netbox:
+    restart: unless-stopped
     healthcheck:
       start_period: 300s
+  netbox-worker:
+    restart: unless-stopped
+  postgres:
+    restart: unless-stopped
+  redis:
+    restart: unless-stopped
+  redis-cache:
+    restart: unless-stopped
 
   tls-proxy:
     image: caddy:2-alpine
@@ -320,6 +329,8 @@ volumes:
   caddy-data:
 ```
 
+- `restart: unless-stopped` on every service: the netbox-docker compose file sets no restart policy,
+  so without it the NetBox containers do not come back after a reboot.
 - `tls internal`: Caddy creates a local CA and issues and renews the certificate by itself.
 - Port 80 only redirects to HTTPS.
 - NetBox's own port is not published: it is reachable only through the proxy, and only by name
@@ -344,7 +355,7 @@ Versions deployed (pinned by netbox-docker):
 
 The interface language is set to English (*Preferences → Language*), to match the documentation.
 
-![NetBox dashboard](../images/phase-03/netbox-dashboard.png)
+![NetBox dashboard](../images/netbox-dashboard.png)
 
 #### Data model
 
@@ -378,15 +389,15 @@ each one references the previous ones.
   physical `nic0` (Phase 1, section 3.2); on the VMs cloud-init names the NIC `eth0` (Phase 2).
 - `192.168.2.200` (Ingress) is a service IP, so it stays unassigned.
 
-![NetBox cluster](../images/phase-03/netbox-cluster.png)
+![NetBox cluster](../images/netbox-cluster.png)
 
-![NetBox virtual machines](../images/phase-03/netbox-virtual-machines.png)
+![NetBox virtual machines](../images/netbox-virtual-machines.png)
 
-![NetBox devices](../images/phase-03/netbox-devices.png)
+![NetBox devices](../images/netbox-devices.png)
 
-![NetBox host interfaces](../images/phase-03/netbox-interfaces.png)
+![NetBox host interfaces](../images/netbox-interfaces.png)
 
-![NetBox prefix](../images/phase-03/netbox-prefix.png)
+![NetBox prefix](../images/netbox-prefix.png)
 
 ### 3.6 Point the lab to Technitium
 
@@ -503,6 +514,7 @@ cd /data/netbox && sudo docker compose ps
 | PTR records | one name per IP | ✅ |
 | Technitium console over HTTPS | `https://dns.rafaelmellonh.com.br:53443` | ✅ |
 | NetBox containers | all `healthy` | ✅ |
+| All 7 containers back after a reboot | `Up` with policy `unless-stopped` | ✅ |
 | NetBox over HTTPS | `https://netbox.rafaelmellonh.com.br` | ✅ |
 | NetBox inventory | counts above, primary IP on every host and VM | ✅ |
 | Nodes, templates and `tools-01` use Technitium | `nameserver 192.168.2.185` first | ✅ |
@@ -556,6 +568,21 @@ The logs showed the migrations still running (`Applying ... OK`).
 
 **Solution:** waited for the migrations to finish, ran `docker compose up -d` again, and raised `start_period`
 to 300s in the override.
+
+### NetBox down after a reboot of `tools-01`
+
+**Symptom:** after rebooting `tools-01`, `https://netbox.rafaelmellonh.com.br` did not open. Technitium and Caddy
+were `Up`, but `docker ps -a` showed the NetBox containers as `Exited (0)` and `netbox-worker` as `Created`.
+
+**Cause:** the netbox-docker compose file has no `restart` policy, so Docker stops those containers at shutdown
+and does not start them again at boot. Technitium and Caddy came back because they have `restart: unless-stopped`.
+
+**Solution:** added `restart: unless-stopped` to every NetBox service in `docker-compose.override.yml`
+(section 3.5), ran `docker compose up -d` and confirmed with a second reboot that all 7 containers come back.
+
+```bash
+sudo docker inspect -f '{{.Name}} {{.HostConfig.RestartPolicy.Name}}' $(sudo docker ps -aq)
+```
 
 ### YAML error in the override
 
