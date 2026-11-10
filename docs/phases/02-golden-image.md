@@ -17,7 +17,7 @@ all injected by cloud-init — nothing specific to one machine is kept in the im
 The template was built by **installing Ubuntu from the ISO** on one node, generalizing the installed
 system and converting it into a template. This was a deliberate choice to understand every step.
 The alternative — importing the official Ubuntu cloud image (`noble-server-cloudimg-amd64.img`) — is
-faster and easier to automate, and is a candidate for a scripted rebuild in [Phase 13](13-rebuild.md).
+faster and easier to automate, and is a candidate for a scripted rebuild in Phase 13.
 
 Because storage is local to each node, a template can only be cloned on the node that holds its disk.
 One template exists on each node:
@@ -163,6 +163,9 @@ template: 1
 ```
 
 These are only defaults: Terraform overrides name, IP, CPU, memory and disk size for each VM.
+
+> The nameserver of both templates was later changed to `192.168.2.185 8.8.8.8` (Technitium first),
+> once `tools-01` existed — see [Phase 3](03-first-vm.md), section 3.6.
 
 ### 3.7 How a clone gets its identity
 
@@ -321,5 +324,4 @@ on an existing template.
 
 - Script the template build (`scripts/`) from the official cloud image, for the rebuild in Phase 13
 - Shared storage, so one template serves both nodes
-- DNS of the template pointing to Technitium once `tools-01` exists
 - Periodic rebuild of the template to include the latest updates

@@ -77,11 +77,11 @@ with a real domain instead of an invented TLD.
 
 | Item | Value |
 |---|---|
-| Server | Technitium DNS Server — `192.168.2.185:53`, web console on port 5380 |
+| Server | Technitium DNS Server — `192.168.2.185:53`, web console on port 5380 (HTTPS on 53443) |
 | Forward zone | `rafaelmellonh.com.br` (split-horizon: internal view of the public domain) |
 | Reverse zone | `2.168.192.in-addr.arpa` (PTR created with each A record) |
-| Forwarders | Router / public resolvers for everything outside the lab zones |
-| Secondary DNS on clients | Router, so the home network keeps working if `tools-01` is down |
+| Forwarders | Public resolvers for everything outside the lab zones |
+| Secondary DNS on clients | `8.8.8.8`, so external names keep resolving if `tools-01` is down (changed from the router in [Phase 3](03-first-vm.md)) |
 
 Planned records:
 
@@ -96,7 +96,7 @@ Planned records:
 | `k8s-worker-02.rafaelmellonh.com.br` | A | 192.168.2.184 |
 | `tools-01.rafaelmellonh.com.br` | A | 192.168.2.185 |
 | `netbox.rafaelmellonh.com.br` | CNAME | tools-01 |
-| `dns.rafaelmellonh.com.br` | CNAME | tools-01 |
+| `dns.rafaelmellonh.com.br` | A | 192.168.2.185 (target of the zone's NS record, so not a CNAME) |
 | `*.apps.rafaelmellonh.com.br` | A | 192.168.2.200 (Ingress) |
 
 Applications in Kubernetes (Grafana, Argo CD, Podinfo, Online Boutique) are published under
