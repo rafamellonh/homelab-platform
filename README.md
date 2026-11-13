@@ -107,7 +107,7 @@ VMs use CPU type `x86-64-v3`, since the two nodes have different CPU generations
 | 1 | Proxmox installation & cluster | ✅ | [01-proxmox](docs/phases/01-proxmox.md) |
 | 2 | Golden image | ✅ | [02-golden-image](docs/phases/02-golden-image.md) |
 | 3 | First VM (manual): DNS and NetBox | ✅ | [03-first-vm](docs/phases/03-first-vm.md) |
-| 4 | Provisioning with Terraform | ⏳ | [04-terraform](docs/phases/04-terraform.md) |
+| 4 | Provisioning with Terraform | ✅ | [04-terraform](docs/phases/04-terraform.md) |
 | 5 | Configuration with Ansible | ⏳ | [05-ansible](docs/phases/05-ansible.md) |
 | 6 | Infrastructure monitoring (Zabbix) | ⏳ | [06-zabbix](docs/phases/06-zabbix.md) |
 | 7 | Kubernetes | ⏳ | [07-kubernetes](docs/phases/07-kubernetes.md) |
@@ -175,6 +175,7 @@ Every phase is documented in [docs/phases](docs/phases) with the same structure:
 - Single control plane node (no Kubernetes high availability).
 - Single DNS server (`tools-01`); clients use `8.8.8.8` as secondary DNS, which resolves external names only.
 - Split-horizon DNS: public records of `rafaelmellonh.com.br` must be mirrored in Technitium to resolve inside the LAN.
+- Terraform state stored locally on the admin workstation (never in Git) until Phase 8 moves it to the GitLab HTTP backend.
 - Self-signed / local-CA certificates on the internal web consoles (browser warning).
 - Not exposed to the internet.
 
