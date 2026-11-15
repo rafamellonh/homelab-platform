@@ -4,3 +4,9 @@
   roles:
     - common
     - ssh_hardening
+
+- name: Kubernetes prerequisites
+  hosts: k8s
+  become: true
+  roles:
+    - k8s_prereqs

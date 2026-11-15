@@ -1,0 +1,8 @@
+k8s_prereqs_modules:
+  - overlay
+  - br_netfilter
+
+k8s_prereqs_sysctl:
+  - net.bridge.bridge-nf-call-iptables
+  - net.bridge.bridge-nf-call-ip6tables
+  - net.ipv4.ip_forward
