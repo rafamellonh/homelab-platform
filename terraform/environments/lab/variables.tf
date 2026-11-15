@@ -5,7 +5,7 @@ variable "ssh_public_key_file" {
   default     = "~/.ssh/id_ed25519.pub"
 }
 variable "proxmox_endpoint" {
-  description = "https://srv01.rafaelmellonh.com.br:8006"
+  description = "Proxmox API URL"
   type        = string
   default     = "https://srv01.rafaelmellonh.com.br:8006"
 }
@@ -36,12 +36,6 @@ variable "network" {
   }
 }
 
-
-variable "ssh_public_key" {
-  description = "Path to the SSH public key injected into the VMs"
-  type        = string
-  default     = "~/.ssh/id_ed25519.pub"
-}
 
 variable "vms" {
   description = "Lab virtual machines"
