@@ -1,0 +1,16 @@
+common_timezone: America/Toronto
+
+common_packages:
+  - vim
+  - curl
+  - wget
+  - git
+  - htop
+  - jq
+  - tree
+  - unzip
+  - dnsutils
+  - bash-completion
+  - chrony
+  - qemu-guest-agent
+  - unattended-upgrades
