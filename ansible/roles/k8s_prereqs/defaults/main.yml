@@ -6,3 +6,10 @@ k8s_prereqs_sysctl:
   - net.bridge.bridge-nf-call-iptables
   - net.bridge.bridge-nf-call-ip6tables
   - net.ipv4.ip_forward
+
+k8s_prereqs_version: "1.36"
+
+k8s_prereqs_packages:
+  - kubelet
+  - kubeadm
+  - kubectl
