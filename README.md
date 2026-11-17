@@ -54,7 +54,7 @@ and the decisions made along the way.
 | Operating system | Ubuntu 24.04 LTS (cloud-init golden image) |
 | Provisioning | Terraform (`bpg/proxmox`) |
 | Configuration | Ansible |
-| Containers & orchestration | Kubernetes (kubeadm), containerd |
+| Containers & orchestration | Kubernetes 1.36 (kubeadm), containerd 2.2 |
 | Repository & CI/CD | GitLab.com + GitLab CI (local runner), mirrored to GitHub |
 | Registry | GitLab Container Registry |
 | GitOps | Argo CD, Kustomize |
@@ -108,7 +108,7 @@ VMs use CPU type `x86-64-v3`, since the two nodes have different CPU generations
 | 2 | Golden image | ✅ | [02-golden-image](docs/phases/02-golden-image.md) |
 | 3 | First VM (manual): DNS and NetBox | ✅ | [03-first-vm](docs/phases/03-first-vm.md) |
 | 4 | Provisioning with Terraform | ✅ | [04-terraform](docs/phases/04-terraform.md) |
-| 5 | Configuration with Ansible | ⏳ | [05-ansible](docs/phases/05-ansible.md) |
+| 5 | Configuration with Ansible | ✅ | [05-ansible](docs/phases/05-ansible.md) |
 | 6 | Infrastructure monitoring (Zabbix) | ⏳ | [06-zabbix](docs/phases/06-zabbix.md) |
 | 7 | Kubernetes | ⏳ | [07-kubernetes](docs/phases/07-kubernetes.md) |
 | 8 | CI/CD | ⏳ | [08-cicd](docs/phases/08-cicd.md) |
@@ -164,7 +164,8 @@ Every phase is documented in [docs/phases](docs/phases) with the same structure:
 - **Portable** — generic Terraform modules, provider-agnostic Ansible roles and Kustomize overlays,
   so the same code can move to the cloud.
 - **Secure by default** — no secrets in the repository; protected GitLab variables and Ansible Vault;
-  fork pipelines don't use the local runner; deployments only from `main`, with manual approval.
+  key-only SSH without root login; fork pipelines don't use the local runner; deployments only from `main`,
+  with manual approval.
 - **Observable** — from the physical host temperature to application latency.
 - **Transparent** — mistakes, questions and decisions are recorded in the documentation, not just the final result.
 
@@ -173,7 +174,8 @@ Every phase is documented in [docs/phases](docs/phases) with the same structure:
 - Local storage on each Proxmox node (one golden image template per node). Shared storage is planned.
 - Two-node Proxmox cluster: if one node goes down, the other loses quorum (a QDevice is planned).
 - Single control plane node (no Kubernetes high availability).
-- Single DNS server (`tools-01`); clients use `8.8.8.8` as secondary DNS, which resolves external names only.
+- Single DNS server (`tools-01`); clients use `8.8.8.8` as secondary DNS, which resolves external names only
+  and can keep clients away from Technitium after it comes back (`systemd-resolved` must be restarted).
 - Split-horizon DNS: public records of `rafaelmellonh.com.br` must be mirrored in Technitium to resolve inside the LAN.
 - Terraform state stored locally on the admin workstation (never in Git) until Phase 8 moves it to the GitLab HTTP backend.
 - Self-signed / local-CA certificates on the internal web consoles (browser warning).
